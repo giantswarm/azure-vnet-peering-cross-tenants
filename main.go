@@ -43,14 +43,14 @@ func main() {
 		panic(err)
 	}
 
-	tenant2VnetClient, err := getVnetClient(tenant2Tenantid, tenant2Subscriptionid, tenant2Clientid, tenant2Clientsecret, strings.Split(tenant2AuxiliaryTenantIDs, ","))
-	if err != nil {
-		panic(err)
-	}
-	tenant2PeeringClient, err := getVnetPeeringsClient(tenant2Tenantid, tenant2Subscriptionid, tenant2Clientid, tenant2Clientsecret, strings.Split(tenant2AuxiliaryTenantIDs, ","))
-	if err != nil {
-		panic(err)
-	}
+	//tenant2VnetClient, err := getVnetClient(tenant2Tenantid, tenant2Subscriptionid, tenant2Clientid, tenant2Clientsecret, strings.Split(tenant2AuxiliaryTenantIDs, ","))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//tenant2PeeringClient, err := getVnetPeeringsClient(tenant2Tenantid, tenant2Subscriptionid, tenant2Clientid, tenant2Clientsecret, strings.Split(tenant2AuxiliaryTenantIDs, ","))
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	log.Printf("Checking if tenant1 virtual network %#q exists in resource group %#q", tenant1VirtualNetworkName, tenant1ResourceGroupName)
 	tenant1Vnet, err := tenant1VnetClient.Get(ctx, tenant1ResourceGroupName, tenant1VirtualNetworkName, "")
@@ -59,13 +59,13 @@ func main() {
 	}
 
 	log.Printf("Checking if tenant2 virtual network %#q exists in resource group %#q", tenant2VirtualNetworkName, tenant2ResourceGroupName)
-	tenant2Vnet, err := tenant2VnetClient.Get(ctx, tenant2ResourceGroupName, tenant2VirtualNetworkName, "")
+	tenant2Vnet, err := tenant1VnetClient.Get(ctx, tenant2ResourceGroupName, tenant2VirtualNetworkName, "")
 	if err != nil {
 		panic(err)
 	}
 
 	log.Printf("Ensuring vnet peering %#q exists on the tenant2 vnet %#q in resource group %#q", tenant1VirtualNetworkName, tenant2VirtualNetworkName, tenant2ResourceGroupName)
-	_, err = tenant2PeeringClient.CreateOrUpdate(ctx, tenant2ResourceGroupName, tenant2VirtualNetworkName, tenant1VirtualNetworkName, buildPeering(*tenant1Vnet.ID))
+	_, err = tenant1PeeringClient.CreateOrUpdate(ctx, tenant2ResourceGroupName, tenant2VirtualNetworkName, tenant1VirtualNetworkName, buildPeering(*tenant1Vnet.ID))
 	if err != nil {
 		panic(err)
 	}
@@ -120,14 +120,14 @@ func parseEnvironmentVariables() {
 	if !ok {
 		panic("TENANT2_VIRTUAL_NETWORK must be set in the environment")
 	}
-	tenant2Clientid, ok = os.LookupEnv("TENANT2_AZURE_CLIENTID")
-	if !ok {
-		panic("TENANT2_AZURE_CLIENTID must be set in the environment")
-	}
-	tenant2Clientsecret, ok = os.LookupEnv("TENANT2_AZURE_CLIENTSECRET")
-	if !ok {
-		panic("TENANT2_AZURE_CLIENTSECRET must be set in the environment")
-	}
+	//tenant2Clientid, ok = os.LookupEnv("TENANT2_AZURE_CLIENTID")
+	//if !ok {
+	//	panic("TENANT2_AZURE_CLIENTID must be set in the environment")
+	//}
+	//tenant2Clientsecret, ok = os.LookupEnv("TENANT2_AZURE_CLIENTSECRET")
+	//if !ok {
+	//	panic("TENANT2_AZURE_CLIENTSECRET must be set in the environment")
+	//}
 	tenant2Tenantid, ok = os.LookupEnv("TENANT2_AZURE_TENANTID")
 	if !ok {
 		panic("TENANT2_AZURE_TENANTID must be set in the environment")
