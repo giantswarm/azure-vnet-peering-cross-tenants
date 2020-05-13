@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2019-11-01/network"
 	"github.com/Azure/go-autorest/autorest"
@@ -23,10 +22,8 @@ var (
 	tenant1Subscriptionid     string
 	tenant1Clientid           string
 	tenant1Clientsecret       string
-	tenant1AuxiliaryTenantIDs string
 	tenant2Tenantid           string
 	tenant2Subscriptionid     string
-	tenant2AuxiliaryTenantIDs string
 	tenant1ResourceGroupName  string
 	tenant1VirtualNetworkName string
 	tenant2ResourceGroupName  string
@@ -36,22 +33,22 @@ var (
 func main() {
 	parseEnvironmentVariables()
 
-	tenant1VnetClient, err := getVnetClient(tenant1Tenantid, tenant1Subscriptionid, tenant1Clientid, tenant1Clientsecret, strings.Split(tenant1AuxiliaryTenantIDs, ","))
+	tenant1VnetClient, err := getVnetClient(tenant1Tenantid, tenant1Subscriptionid, tenant1Clientid, tenant1Clientsecret, []string{tenant2Tenantid})
 	if err != nil {
 		panic(err)
 	}
 
-	tenant1PeeringClient, err := getVnetPeeringsClient(tenant1Tenantid, tenant1Subscriptionid, tenant1Clientid, tenant1Clientsecret, strings.Split(tenant1AuxiliaryTenantIDs, ","))
+	tenant1PeeringClient, err := getVnetPeeringsClient(tenant1Tenantid, tenant1Subscriptionid, tenant1Clientid, tenant1Clientsecret, []string{tenant2Tenantid})
 	if err != nil {
 		panic(err)
 	}
 
-	tenant2VnetClient, err := getVnetClient(tenant2Tenantid, tenant2Subscriptionid, tenant1Clientid, tenant1Clientsecret, strings.Split(tenant2AuxiliaryTenantIDs, ","))
+	tenant2VnetClient, err := getVnetClient(tenant2Tenantid, tenant2Subscriptionid, tenant1Clientid, tenant1Clientsecret, []string{tenant1Tenantid})
 	if err != nil {
 		panic(err)
 	}
 
-	tenant2PeeringClient, err := getVnetPeeringsClient(tenant2Tenantid, tenant2Subscriptionid, tenant1Clientid, tenant1Clientsecret, strings.Split(tenant2AuxiliaryTenantIDs, ","))
+	tenant2PeeringClient, err := getVnetPeeringsClient(tenant2Tenantid, tenant2Subscriptionid, tenant1Clientid, tenant1Clientsecret, []string{tenant1Tenantid})
 	if err != nil {
 		panic(err)
 	}
@@ -110,10 +107,6 @@ func parseEnvironmentVariables() {
 	if !ok {
 		panic("TENANT1_AZURE_SUBSCRIPTIONID must be set in the environment")
 	}
-	tenant1AuxiliaryTenantIDs, ok = os.LookupEnv("TENANT1_AZURE_AUX_TENANTIDS")
-	if !ok {
-		panic("TENANT1_AZURE_AUX_TENANTIDS must be set in the environment")
-	}
 
 	// Tenant2
 	tenant2ResourceGroupName, ok = os.LookupEnv("TENANT2_RESOURCE_GROUP")
@@ -131,10 +124,6 @@ func parseEnvironmentVariables() {
 	tenant2Subscriptionid, ok = os.LookupEnv("TENANT2_AZURE_SUBSCRIPTIONID")
 	if !ok {
 		panic("TENANT2_AZURE_SUBSCRIPTIONID must be set in the environment")
-	}
-	tenant2AuxiliaryTenantIDs, ok = os.LookupEnv("TENANT2_AZURE_AUX_TENANTIDS")
-	if !ok {
-		panic("TENANT2_AZURE_AUX_TENANTIDS must be set in the environment")
 	}
 }
 
